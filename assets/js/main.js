@@ -3,13 +3,14 @@ $(document).ready(function () {
     const heroNumber = $('#heroNumber')
     const heroForm = $('#heroForm')
     const heroDetails = $('#heroDetails')
+
     heroForm.on('submit', function (e) {
 
         e.preventDefault()
 
         heroNumber.removeClass('is-valid is-invalid')
-
         const heroNumberInteger = parseFloat(heroNumber.val())
+
         if (heroNumberInteger <= 0 || heroNumberInteger > 731) {
             alert('El Superhero debe estar entre los numeros 1 y 731')
             heroNumber.addClass('is-invalid')
@@ -28,13 +29,26 @@ $(document).ready(function () {
                     publisher: hero.biography.publisher,
                     affiliation: hero.connections['group-affiliation'],
                     image: hero.image.url,
-                    intelligence : hero.powerstats.intelligence,
-                    strength : hero.powerstats.strength,
-                    speed : hero.powerstats.speed,
-                    durability : hero.powerstats.durability,
-                    power : hero.powerstats.power,
-                    combat : hero.powerstats.combat
                 }
+
+                const heroPowerstats = {
+                    intelligence: hero.powerstats.intelligence,
+                    strength: hero.powerstats.strength,
+                    speed: hero.powerstats.speed,
+                    durability: hero.powerstats.durability,
+                    power: hero.powerstats.power,
+                    combat: hero.powerstats.combat
+                }
+
+                const dataPoints = Object.entries(heroPowerstats)
+                    .map(([propiedad, valor]) => ({ y: valor, name: propiedad }))
+                    .filter(powerstat => powerstat.y !== 'null');
+
+                if(dataPoints.length === 0){
+                    alert(`superHero "${heroInfo.name}" no posee ninguna estadistica de poder`)
+                }
+
+
                 heroDetails.html(`
                     <h5>SuperHero encontrado !</h5>
                     <div class="col-12 col-md-6 card mb-3">
@@ -60,27 +74,20 @@ $(document).ready(function () {
                 const chart = new CanvasJS.Chart("chartContainer", {
                     exportEnabled: true,
                     animationEnabled: true,
-                    title:{
+                    title: {
                         text: `Estadisticas de Poder para ${heroInfo.name}`
                     },
-                    legend:{
-                        cursor: "pointer",   
+                    legend: {
+                        cursor: "pointer",
                     },
                     data: [{
                         type: "pie",
                         showInLegend: true,
                         indexLabel: "{name} ({y})",
-                        dataPoints: [
-                            { y: `${heroInfo.intelligence}`, name: "Intelligence"},
-                            { y: `${heroInfo.strength}`, name: "Strength" },
-                            { y: `${heroInfo.speed}`, name: "Speed" },
-                            { y: `${heroInfo.durability}`, name: "Durability" },
-                            { y: `${heroInfo.power}`, name: "Power" },
-                            { y: `${heroInfo.combat}`, name: "Combat" },
-                        ]
+                        dataPoints: dataPoints
                     }]
                 });
-                chart.render();  
+                chart.render();
             },
             error(err) {
                 console.log(err)
@@ -91,7 +98,7 @@ $(document).ready(function () {
 })
 
 
-    
-    
-    
+
+
+
 
